@@ -154,7 +154,7 @@ def generate():
         return jsonify({"error": "Internal server error"}), 500
 
 def get_gemini_response2(prompt):
-    models = ["gemini-2.5-flash-preview-04-17", "gemini-2.5-flash-preview-04-17", "gemini-2.5-flash-preview-04-17"]
+    models = ["gemini-2.0-flash", "gemini-2.0-flash", "gemini-2.5-flash-preview-04-17"]
     temperatures = [1.0, 1.0, 0.5]
 
     for attempt in range(MAX_RETRIES):
