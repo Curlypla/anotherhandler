@@ -1,7 +1,7 @@
 import time
 import random
 import os
-import json
+import json, requests
 from flask import Flask, request, jsonify
 from google import genai
 from google.genai import types
