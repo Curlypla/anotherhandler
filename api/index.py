@@ -154,7 +154,7 @@ def generate():
         return jsonify({"error": "Internal server error"}), 500
 
 def get_gemini_response2(prompt):
-    models = ["gemini-2.0-flash", "gemini-2.0-flash", "gemini-2.5-flash-preview-04-17"]
+    models = ["gemini-2.5-flash-preview-04-17", "gemini-2.5-flash-preview-04-17", "gemini-2.5-flash-preview-04-17"]
     temperatures = [1.0, 1.0, 0.5]
 
     for attempt in range(MAX_RETRIES):
@@ -163,23 +163,56 @@ def get_gemini_response2(prompt):
             api_key = key_manager.get_available_key(model_type)
             print(f"Using key: {api_key}, Attempt: {attempt + 1}, Model: {models[attempt]}, Temperature: {temperatures[attempt]}")
             
+            model = "gemini-2.5-pro-exp-03-25" # gemini-2.5-flash-preview-04-17
+
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"  # Remplace par ta vraie clé API
+
+            headers = {
+                "Content-Type": "application/json",
+            }
+
+            data = {
+                "generationConfig": {
+                    "temperature": 1,
+                    "topP": 0.95,
+                    "topK": 64,
+                    "maxOutputTokens": 65536,
+                    "responseMimeType": "text/plain"
+                },
+                "contents": [
+                    {
+                        "role": "user",
+                        "parts": [
+                            {"text": prompt}
+                        ]
+                    }
+                ]
+            }
+
+            response = requests.post(url, headers=headers, json=data, timeout=60*5)
+            raw_res = response.text
+            with open("rawres.txt", "a", encoding="utf-8") as f:
+                f.write(raw_res + "\n")
+            response = response.json()
+            chat_response = response["candidates"][0]["content"]["parts"][0]["text"]
+            return chat_response
             # Create client with API key
-            client = genai.Client(api_key=api_key)
+            # client = genai.Client(api_key=api_key)
             
-            # Create generation config
-            generation_config = types.GenerateContentConfig(
-                temperature=temperatures[attempt],
-                safety_settings=SAFETY_SETTINGS,
-                thinking_config={'thinking_budget': 0}
-            )
+            # # Create generation config
+            # generation_config = types.GenerateContentConfig(
+            #     temperature=temperatures[attempt],
+            #     safety_settings=SAFETY_SETTINGS,
+            #     thinking_config={'thinking_budget': 0}
+            # )
             
-            # Generate content
-            response = client.models.generate_content(
-                model=models[attempt],
-                contents=prompt,
-                config=generation_config
-            )
-            return response.text
+            # # Generate content
+            # response = client.models.generate_content(
+            #     model=models[attempt],
+            #     contents=prompt,
+            #     config=generation_config
+            # )
+            # return response.text
         except Exception as e:
             print("error : " + e )
             if attempt == MAX_RETRIES - 1:  # If this was the last attempt
@@ -187,7 +220,7 @@ def get_gemini_response2(prompt):
             time.sleep(1)  # Wait a bit before retrying
     
     return "Unexpected error occurred"
-
+    
 @app.route('/generate2', methods=['POST'])
 def generate2():
     try:
