@@ -163,7 +163,7 @@ def get_gemini_response2(prompt):
             api_key = key_manager.get_available_key(model_type)
             print(f"Using key: {api_key}, Attempt: {attempt + 1}, Model: {models[attempt]}, Temperature: {temperatures[attempt]}")
             
-            model = "gemini-2.5-pro-exp-03-25" # gemini-2.5-flash-preview-04-17
+            model = "gemini-2.5-flash-preview-04-17" # gemini-2.5-flash-preview-04-17
 
             url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"  # Remplace par ta vraie clé API
 
